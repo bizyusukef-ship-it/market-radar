@@ -1,0 +1,54 @@
+name: Daily dashboard update
+
+# 毎朝6:00 JST（=前日21:00 UTC）に自動実行。GitHubの画面から手動実行も可能。
+on:
+  schedule:
+    - cron: "0 21 * * *"
+  workflow_dispatch:
+
+# 生成したHTML等をリポジトリに書き戻す（push）ための権限。
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: リポジトリを取得
+        uses: actions/checkout@v4
+
+      - name: Pythonを準備
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: 依存パッケージをインストール
+        run: pip install -r requirements.txt
+
+      - name: 今日の日付（JST）を計算
+        id: date
+        run: echo "today=$(TZ='Asia/Tokyo' date +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: イベント日程を更新（失敗しても続行）
+        run: python build_event_master.py
+        continue-on-error: true
+
+      - name: 実績値の収集とダッシュボード生成
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: |
+          python assemble_events.py ${{ steps.date.outputs.today }}
+          python generate_dashboard.py ${{ steps.date.outputs.today }}
+          python publish.py ${{ steps.date.outputs.today }}
+
+      - name: 変更があれば commit して push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "変更なし。何もしません。"
+          else
+            git commit -m "Auto update dashboard for ${{ steps.date.outputs.today }}"
+            git push
+          fi

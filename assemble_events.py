@@ -67,6 +67,28 @@ def build_sources(row, event_key):
     return sources
 
 
+def _minimal_event(row):
+    """組み立てに失敗したイベントの、実績値なしの最低限の枠。"""
+    m = EVENT_ID_RE.match(row["event_id"])
+    event_key = m.group(1) if m else row["event_id"]
+    dic = EVENT_DICTIONARY.get(event_key, {"meaning": "", "deep_dive": [], "reaction": ""})
+    return {
+        "time": row["datetime_jst"][11:16],
+        "country": row["country"],
+        "name": row["name"],
+        "impact": row["impact"],
+        "unit": "",
+        "consensus": None,
+        "prior": None,
+        "actual": None,
+        "meaning": dic["meaning"],
+        "deep_dive": dic["deep_dive"],
+        "reaction": dic["reaction"],
+        "market": PLACEHOLDER_MARKET,
+        "sources": build_sources(row, event_key),
+    }
+
+
 def assemble_event(row, overrides):
     m = EVENT_ID_RE.match(row["event_id"])
     event_key = m.group(1) if m else row["event_id"]
@@ -125,7 +147,15 @@ def main():
     with open(EVENT_MASTER_PATH, encoding="utf-8-sig") as f:
         rows = [r for r in csv.DictReader(f) if r["datetime_jst"].startswith(date_str)]
 
-    events = [assemble_event(r, overrides) for r in rows]
+    # 無人の自動実行でも、1件のイベント取得が失敗しただけで全体が止まらないよう、
+    # イベントごとに例外を握りつぶす（失敗分は実績値null=未取得のまま最低限の枠で出す）。
+    events = []
+    for r in rows:
+        try:
+            events.append(assemble_event(r, overrides))
+        except Exception as e:
+            print(f"! {r['event_id']} の組み立てに失敗（スキップせず枠のみ出力）: {e}")
+            events.append(_minimal_event(r))
     events.sort(key=lambda e: e["time"])
 
     out_path = f"events_{date_str}.json"
