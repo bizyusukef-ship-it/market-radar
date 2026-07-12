@@ -1,0 +1,363 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Market Radar — 経済イベント・ダッシュボード</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EAE7DE; --surface:#F6F4EE; --surface-2:#FBFAF7;
+    --ink:#383322; --ink-soft:#6A6350; --ink-faint:#938B76;
+    --line:#DAD5C6; --line-soft:#E6E2D6;
+    --olive:#6E6440; --sky:#3E7CA8; --sky-soft:#E4EDF3;
+    --high:#A9552F; --mid:#B58A34; --low:#8A8F73;
+    --beat:#5E7D46; --miss:#A9552F;
+    --radius:10px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Noto Sans JP",system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+    font-weight:400; line-height:1.65; -webkit-font-smoothing:antialiased;
+  }
+  .num{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; letter-spacing:-.02em}
+  .wrap{max-width:880px; margin:0 auto; padding:0 20px}
+
+  header{position:sticky; top:0; z-index:10; background:rgba(234,231,222,.92); backdrop-filter:blur(8px); border-bottom:1px solid var(--line)}
+  .head{display:flex; align-items:flex-end; justify-content:space-between; gap:12px; padding:14px 0 10px}
+  .brand h1{margin:0; font-size:19px; font-weight:700; letter-spacing:.02em}
+  .brand p{margin:2px 0 0; font-size:12px; color:var(--ink-soft); font-weight:300}
+  .brand .accent{color:var(--sky)}
+  .meta{text-align:right; font-size:12px; color:var(--ink-soft); white-space:nowrap}
+  .date{font-weight:500}
+  .sample-tag{display:inline-block; margin-top:4px; font-size:10.5px; font-weight:500; color:#8a5a2a; background:#F3E7D3; border:1px solid #E4CFA9; border-radius:999px; padding:2px 8px; letter-spacing:.04em}
+
+  .legend{display:flex; gap:12px; flex-wrap:wrap; padding:8px 0 12px; font-size:11.5px; color:var(--ink-soft)}
+  .legend span{display:inline-flex; align-items:center; gap:5px; white-space:nowrap}
+  .dot{width:9px; height:9px; border-radius:50%; display:inline-block}
+  .dot.high{background:var(--high)} .dot.mid{background:var(--mid)} .dot.low{background:var(--low)}
+
+  .overview{margin:18px 0 6px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px}
+  .overview .eyebrow{font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--sky); font-weight:500; margin-bottom:6px}
+  .overview p{margin:0; font-size:14.5px}
+  .overview .more{margin-top:10px; font-size:13.5px; color:var(--ink-soft); display:none}
+  .overview.open .more{display:block}
+  .ov-toggle{margin-top:8px; background:none; border:none; color:var(--sky); font:inherit; font-size:12.5px; font-weight:500; cursor:pointer; padding:0}
+  .ov-toggle:hover{text-decoration:underline}
+
+  .day-label{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); font-weight:500; margin:24px 0 12px}
+  .timeline{position:relative; margin-left:6px; padding-left:20px; border-left:2px solid var(--line)}
+  .event{position:relative; margin-bottom:12px}
+  .event::before{content:""; position:absolute; left:-27px; top:18px; width:11px; height:11px; border-radius:50%; background:var(--low); border:2px solid var(--bg)}
+  .event.high::before{background:var(--high)} .event.mid::before{background:var(--mid)}
+
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; transition:border-color .15s ease, box-shadow .15s ease}
+  .card:hover{border-color:#CFC8B4}
+  .event.open .card{border-color:var(--sky); box-shadow:0 3px 14px rgba(62,124,168,.10)}
+
+  .summary{
+    width:100%; text-align:left; background:none; border:none; font:inherit; color:inherit; cursor:pointer;
+    padding:12px 14px; display:grid; grid-template-columns:auto 1fr auto; gap:6px 10px; align-items:center;
+  }
+  .summary:focus-visible{outline:2px solid var(--sky); outline-offset:-2px}
+  .time{font-size:13.5px; font-weight:500; color:var(--ink-soft); white-space:nowrap}
+  .time .tz{font-size:9.5px; color:var(--ink-faint); font-weight:400; margin-left:2px}
+  .ename{font-size:15px; font-weight:500; line-height:1.45; min-width:0}
+  .flag{display:inline-block; font-size:10px; font-weight:500; letter-spacing:.05em; color:#fff; padding:1px 6px; border-radius:4px; vertical-align:1px; margin-right:6px}
+  .flag.US{background:#4A5A7A} .flag.JP{background:#8A6A4A}
+  .impact{font-size:10.5px; font-weight:500; letter-spacing:.06em; padding:2px 8px; border-radius:999px; white-space:nowrap; justify-self:end}
+  .impact.high{color:var(--high); background:#F1DFD3; border:1px solid #E3C4B0}
+  .impact.mid{color:#8a6820; background:#F1E6CB; border:1px solid #E1D0A2}
+  .impact.low{color:#5f6449; background:#E7E9DC; border:1px solid #D3D6BF}
+  .chev{margin-left:4px; color:var(--ink-faint); display:inline-block; transition:transform .2s ease}
+  .event.open .chev{transform:rotate(180deg)}
+
+  .mini{
+    grid-column:1 / -1; display:flex; flex-wrap:wrap; gap:2px 14px;
+    font-size:12px; color:var(--ink-soft); margin-top:-2px;
+  }
+  .mini span{white-space:nowrap}
+  .mini b{font-weight:500; color:var(--ink)}
+  .surprise{font-weight:500; white-space:nowrap}
+  .surprise.up{color:var(--beat)} .surprise.down{color:var(--miss)}
+
+  .detail{display:grid; grid-template-rows:0fr; transition:grid-template-rows .25s ease}
+  .event.open .detail{grid-template-rows:1fr}
+  .detail-inner{overflow:hidden}
+  .detail-body{padding:2px 14px 16px; border-top:1px solid var(--line-soft)}
+  .block{margin-top:14px}
+  .block h3{margin:0 0 6px; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--olive); font-weight:500}
+  .block p{margin:0; font-size:13.5px}
+  .deep p{margin:0 0 8px; font-size:13.5px; color:var(--ink-soft)}
+  .deep p:last-child{margin-bottom:0}
+  .deep p b{color:var(--ink); font-weight:500}
+
+  /* 発表内容の要点（非定型イベント用） */
+  .highlights{border:1px solid var(--line); border-radius:8px; overflow:hidden}
+  .hl{display:grid; grid-template-columns:112px 1fr; border-top:1px solid var(--line-soft)}
+  .hl:first-child{border-top:none}
+  .hl .k{background:var(--surface-2); padding:10px 12px; font-size:11.5px; font-weight:500; color:var(--olive); letter-spacing:.02em}
+  .hl .v{padding:10px 12px; font-size:13px; overflow-wrap:anywhere}
+
+  .reaction{background:var(--sky-soft); border:1px solid #CFE0EB; border-radius:8px; padding:12px 14px}
+  .reaction h3{color:var(--sky)}
+  .figures{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line-soft); border:1px solid var(--line-soft); border-radius:8px; overflow:hidden}
+  .fig{background:var(--surface-2); padding:9px 12px}
+  .fig .k{font-size:10.5px; color:var(--ink-faint); letter-spacing:.04em}
+  .fig .v{font-size:16px; font-weight:500; margin-top:2px; white-space:nowrap}
+  .market{display:grid; grid-template-columns:repeat(auto-fit,minmax(90px,1fr)); gap:10px 14px}
+  .mkt{font-size:13px}
+  .mkt .k{font-size:10.5px; color:var(--ink-faint); display:block}
+  .mkt .v{font-weight:500; white-space:nowrap}
+  .mkt .v.up{color:var(--beat)} .mkt .v.down{color:var(--miss)}
+  .sources{list-style:none; margin:6px 0 0; padding:0; font-size:12.5px}
+  .sources li{padding:3px 0; color:var(--ink-faint); overflow-wrap:anywhere}
+  .sources li::before{content:"↳ "; color:var(--sky)}
+
+  footer{margin:36px 0 40px; padding-top:16px; border-top:1px solid var(--line); font-size:11.5px; color:var(--ink-faint); line-height:1.7}
+
+  @media (max-width:560px){
+    .wrap{padding:0 14px}
+    .head{align-items:flex-start}
+    .brand p{display:none}
+    .ename{font-size:14.5px}
+    .figures{grid-template-columns:repeat(3,1fr)}
+    .fig{padding:8px 9px}
+    .fig .v{font-size:14.5px}
+    .hl{grid-template-columns:96px 1fr}
+    .hl .k{padding:9px 10px; font-size:11px}
+    .hl .v{padding:9px 10px; font-size:12.5px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important; scroll-behavior:auto !important}
+  }
+</style>
+
+<header>
+  <div class="wrap">
+    <div class="head">
+      <div class="brand">
+        <h1>Market <span class="accent">Radar</span></h1>
+        <p>本日の高影響イベントと、想定される市場の方向感</p>
+      </div>
+      <div class="meta">
+        <div class="date num" id="today">2026 / 07 / 03（木）</div>
+        <span class="sample-tag">サンプルデータ（数値はダミー）</span>
+      </div>
+    </div>
+    <div class="legend">
+      <span><i class="dot high"></i>高</span>
+      <span><i class="dot mid"></i>中</span>
+      <span><i class="dot low"></i>低</span>
+      <span style="margin-left:auto">タップで詳細</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="overview" id="overview">
+    <div class="eyebrow">今日の要点</div>
+    <p id="ov-lead">米CPIとNFPが同日に集中する重い一日。インフレ・雇用ともに上振れなら、利下げ後ずれ観測から金利上昇・株式（特にグロース）に逆風がかかりやすい構図。</p>
+    <div class="more" id="ov-more">
+      日本時間の午前は日銀短観で国内景況感を確認、夜は米指標ラッシュ、翌未明のFOMCで金利据え置きの是非とパウエル発言のトーンが最大の焦点。結果そのものより「予想との差（サプライズ）」と、その後の長期金利・ドル円の反応方向をセットで見るのが要点です。個別の指標解説は各イベントを開いて確認してください。
+    </div>
+    <button class="ov-toggle" id="ov-toggle" aria-expanded="false">詳しく見る ▾</button>
+  </section>
+
+  <div class="day-label">タイムライン（JST）</div>
+  <div class="timeline" id="timeline"><!-- events injected --></div>
+
+  <footer>
+    このダッシュボードは公開情報を整理・要約するためのものです。「想定される株価の反応」は一般的・教科書的な方向性の目安であり、特定銘柄の売買判断や将来予測ではありません。実際の値動きは他の多数の要因で変わります。<br>
+    データソース／数値は収集モジュールが自動挿入します（現在はサンプル表示）。
+  </footer>
+</main>
+
+<script>
+/* ============================================================
+   データ契約（event_master + 収集モジュールが埋める1件の形）
+   ------------------------------------------------------------
+   time      : "21:30"          表示時刻（JST）
+   country   : "US" | "JP"
+   name      : イベント名
+   impact    : "high" | "mid" | "low"
+   unit      : 単位（"%", "万人" 等）
+   consensus : 市場予想（非数値イベントは "据え置き" 等の文字列可）
+   prior     : 前回値
+   actual    : 実績（未発表なら null）
+   meaning   : 指標の1行サマリー（一覧性重視）
+   deep_dive : 詳細解説。段落の配列。<b>タグ使用可
+               （背景／構成要素／どの数字・文言を見るべきか）
+   highlights: 非定型イベント用・発表内容の要点。省略可。
+               [{k:"ラベル", v:"内容"}] の配列。
+               FOMCなら 声明/ドットチャート/会見トーン、
+               日銀会合なら 声明/展望レポート/総裁会見 等を
+               収集モジュール＋AI要約が埋める。
+   reaction  : 想定される株価の反応（一般的な方向性・教科書的解釈）
+   market    : { nikkei, sp500, us10y, usdjpy }  発表後の市場反応
+   sources   : [ "媒体名 記事タイトル", ... ]  収集時に自動挿入
+   ============================================================ */
+const EVENTS = [
+  {
+    time:"08:50", country:"JP", name:"日銀短観 大企業製造業DI", impact:"high", unit:"",
+    consensus:"+12", prior:"+14", actual:"+13",
+    meaning:"日銀が四半期ごとに公表する企業の景況感調査。",
+    deep_dive:[
+      "全国約1万社への調査で、「業況が良い」と答えた企業の割合から「悪い」の割合を引いた値がDI。<b>プラス幅が大きいほど景況感が良い</b>。",
+      "見出しになるのは大企業製造業DIだが、内訳の<b>設備投資計画</b>と<b>想定為替レート</b>も重要。企業の想定レートより実勢が円安なら輸出企業の業績上振れ余地を示す。",
+      "日銀が金融政策判断の材料に使う調査のため、強い結果は利上げ（正常化）観測に直結しやすい。"
+    ],
+    reaction:"上振れ（景況感改善）は日本株の追い風。ただし強すぎると日銀の正常化（利上げ）観測を強め、円高・輸出株の逆風要因にもなり得る。",
+    market:{nikkei:"+0.4%", sp500:"—", us10y:"—", usdjpy:"-0.2%"},
+    sources:["（収集時に自動挿入）"]
+  },
+  {
+    time:"08:30", country:"JP", name:"全国CPI（コア・前年比）", impact:"mid", unit:"%",
+    consensus:"2.5", prior:"2.6", actual:"2.7",
+    meaning:"生鮮食品を除く消費者物価指数。日銀の物価目標2%との距離を測る中心指標。",
+    deep_dive:[
+      "「コアCPI」＝生鮮食品を除く総合。天候で振れる生鮮を除き、物価の基調を見る。さらにエネルギーも除いた<b>コアコアCPI</b>は賃金・サービス由来のインフレ圧力を映す。",
+      "日銀は「賃金と物価の好循環」を重視しており、<b>サービス価格の伸び</b>が持続的かどうかが政策判断の分かれ目になる。"
+    ],
+    reaction:"上振れは利上げ観測を通じて円高・金利上昇要因。銀行株にはプラス、金利敏感なグロース株や不動産にはマイナスに働きやすい。",
+    market:{nikkei:"-0.1%", sp500:"—", us10y:"—", usdjpy:"-0.3%"},
+    sources:["（収集時に自動挿入）"]
+  },
+  {
+    time:"21:30", country:"US", name:"消費者物価指数 CPI（前年比）", impact:"high", unit:"%",
+    consensus:"3.1", prior:"3.3", actual:"3.4",
+    meaning:"米インフレの中心指標。FRBの利下げ・利上げ判断に直結する。",
+    deep_dive:[
+      "米労働省（BLS）が毎月発表。市場が最も注目するのは<b>コアCPI（食品・エネルギー除く）の前月比</b>で、直近のインフレ運動量を示す。",
+      "内訳では<b>住居費（シェルター）</b>がコアの約4割を占め遅行しやすい。住居費を除いた<b>スーパーコア（コアサービスから住居を除く）</b>は賃金インフレの代理指標としてFRBが注視。",
+      "FRBの物価目標はCPIではなく<b>PCEデフレーター</b>だが、CPIの方が先に出るため相場への初動インパクトはCPIが最大。"
+    ],
+    reaction:"予想上振れ（インフレ再燃）は利下げ後ずれ観測 → 長期金利上昇・ドル高・株安、特に高PERのグロース株に逆風。下振れなら逆にリスクオン。",
+    market:{nikkei:"—", sp500:"-1.1%", us10y:"+8bp", usdjpy:"+0.6%"},
+    sources:["（収集時に自動挿入）"]
+  },
+  {
+    time:"21:30", country:"US", name:"非農業部門雇用者数 NFP", impact:"high", unit:"万人",
+    consensus:"+18.0", prior:"+22.7", actual:"+25.6",
+    meaning:"米雇用統計の中核。景気の強さと賃金インフレ圧力を映す。",
+    deep_dive:[
+      "毎月第1金曜発表。ヘッドラインのNFPと同時に<b>失業率</b>と<b>平均時給（前月比/前年比）</b>が出る。インフレ観点では平均時給が最重要。",
+      "<b>過去2カ月分の改定値</b>も相場を動かす。ヘッドラインが強くても大幅下方改定なら評価は割引かれる。",
+      "労働参加率や週平均労働時間まで見ると、雇用の「量」と「質」の両面が判断できる。"
+    ],
+    reaction:"大幅上振れ（雇用が強い）は景気堅調を示す一方、利下げ観測を後退させ金利上昇 → 株はまちまち〜逆風。弱ければ利下げ期待で株高に振れやすい。",
+    market:{nikkei:"—", sp500:"-0.7%", us10y:"+6bp", usdjpy:"+0.4%"},
+    sources:["（収集時に自動挿入）"]
+  },
+  {
+    time:"23:00", country:"US", name:"ISM製造業景況指数", impact:"mid", unit:"",
+    consensus:"48.5", prior:"48.7", actual:"47.9",
+    meaning:"製造業の景況感。50が拡大・縮小の分岐点。",
+    deep_dive:[
+      "購買担当者へのアンケートに基づくPMI型指標で、<b>50超＝拡大、50未満＝縮小</b>。実体データより早く出るため景気の先行指標とされる。",
+      "内訳の<b>新規受注</b>（先行性が最も高い）、<b>雇用</b>（雇用統計の先読み）、<b>支払価格</b>（インフレ圧力）の3項目が特に材料視される。"
+    ],
+    reaction:"50割れ深化（下振れ）は景気減速シグナルで株の重し。ただし利下げ期待の高まりが下支えする局面もあり、金利との綱引きになりやすい。",
+    market:{nikkei:"—", sp500:"-0.3%", us10y:"-2bp", usdjpy:"-0.1%"},
+    sources:["（収集時に自動挿入）"]
+  },
+  {
+    time:"03:00", country:"US", name:"FOMC 政策金利発表・議長会見", impact:"high", unit:"",
+    consensus:"据え置き", prior:"4.50%", actual:"据え置き",
+    meaning:"米金融政策の決定会合。金利水準より声明・見通し・会見のトーンが相場を動かす。",
+    deep_dive:[
+      "年8回開催。発表物は<b>①声明文 ②経済見通し（SEP）とドットチャート（四半期会合のみ） ③30分後の議長会見</b>の3点セットで、それぞれが独立に相場を動かす。",
+      "声明文は<b>前回からの文言変更</b>が全て。景気・インフレ認識の形容詞1つの変化が政策転換のシグナルとして読まれる。",
+      "ドットチャートは参加者の政策金利見通しの分布。<b>中央値の利下げ回数</b>が市場の織り込みとズレると大きく動く。"
+    ],
+    highlights:[
+      {k:"金利決定", v:"FF金利誘導目標を4.25-4.50%で据え置き（サンプル）。票決は11対1、1名が25bp利下げを主張し反対票。"},
+      {k:"声明の変化", v:"景気認識を「堅調（solid）」から「緩やかに拡大（moderate）」へ下方修正。インフレは「やや高止まり」の表現を維持（サンプル）。"},
+      {k:"ドットチャート", v:"2026年末の中央値は年2回の利下げを示唆。前回の3回から後退し、市場の織り込み（2.5回）よりタカ派寄り（サンプル）。"},
+      {k:"会見トーン", v:"議長は「次回会合での利下げを排除しない」と発言しつつ、データ次第を強調。全体としてニュートラル〜ややハト派と受け止められた（サンプル）。"}
+    ],
+    reaction:"タカ派（利下げに慎重）ならリスクオフで株安・金利高・ドル高。ハト派（利下げ前向き）ならリスクオンで株高・ドル安に振れやすい。",
+    market:{nikkei:"—", sp500:"+0.9%", us10y:"-5bp", usdjpy:"-0.5%"},
+    sources:["（収集時に自動挿入）"]
+  }
+];
+
+const tl = document.getElementById('timeline');
+
+function surpriseTag(consensus, actual){
+  const c = parseFloat(String(consensus).replace(/[^\d.\-]/g,''));
+  const a = parseFloat(String(actual).replace(/[^\d.\-]/g,''));
+  if(Number.isNaN(c) || Number.isNaN(a) || actual===null) return '';
+  if(a>c) return '<span class="surprise up">▲ 上振れ</span>';
+  if(a<c) return '<span class="surprise down">▼ 下振れ</span>';
+  return '<span class="surprise">＝ 予想通り</span>';
+}
+function dir(v){
+  if(typeof v!=='string') return '';
+  if(v.startsWith('+')) return 'up';
+  if(v.startsWith('-')) return 'down';
+  return '';
+}
+function fmtVal(v, unit){
+  return (v===null || v===undefined) ? '<span style="color:var(--ink-faint)">未取得</span>' : v+unit;
+}
+
+EVENTS.forEach((e,i)=>{
+  const el = document.createElement('div');
+  el.className = 'event '+e.impact;
+  const actualTxt = e.actual===null ? '<span style="color:var(--ink-faint)">未発表</span>' : e.actual+e.unit;
+  const deepHtml = (e.deep_dive||[]).map(p=>`<p>${p}</p>`).join('');
+  const hlHtml = (e.highlights && e.highlights.length)
+    ? `<div class="block"><h3>発表内容の要点</h3><div class="highlights">${
+        e.highlights.map(h=>`<div class="hl"><div class="k">${h.k}</div><div class="v">${h.v}</div></div>`).join('')
+      }</div></div>` : '';
+  el.innerHTML = `
+    <div class="card">
+      <button class="summary" aria-expanded="false" aria-controls="d${i}">
+        <span class="time num">${e.time}<span class="tz">JST</span></span>
+        <span class="ename"><span class="flag ${e.country}">${e.country}</span>${e.name}</span>
+        <span class="impact ${e.impact}">${e.impact==='high'?'高':e.impact==='mid'?'中':'低'}<span class="chev">▾</span></span>
+        <span class="mini">
+          <span>予想 <b class="num">${fmtVal(e.consensus,e.unit)}</b></span>
+          <span>前回 <b class="num">${fmtVal(e.prior,e.unit)}</b></span>
+          <span>実績 <b class="num">${actualTxt}</b></span>
+          ${surpriseTag(e.consensus,e.actual)}
+        </span>
+      </button>
+      <div class="detail"><div class="detail-inner"><div class="detail-body" id="d${i}">
+        <div class="block deep"><h3>この指標は何か</h3><p><b>${e.meaning}</b></p>${deepHtml}</div>
+        <div class="block figures">
+          <div class="fig"><div class="k">市場予想</div><div class="v num">${fmtVal(e.consensus,e.unit)}</div></div>
+          <div class="fig"><div class="k">前回</div><div class="v num">${fmtVal(e.prior,e.unit)}</div></div>
+          <div class="fig"><div class="k">実績</div><div class="v num">${e.actual===null?'—':e.actual+e.unit}</div></div>
+        </div>
+        ${hlHtml}
+        <div class="block reaction"><h3>想定される株価の反応（一般的な方向性）</h3><p>${e.reaction}</p></div>
+        <div class="block"><h3>市場反応（未収集）</h3><div class="market">
+          <span class="mkt"><span class="k">日経平均</span><span class="v ${dir(e.market.nikkei)} num">${e.market.nikkei}</span></span>
+          <span class="mkt"><span class="k">S&P500</span><span class="v ${dir(e.market.sp500)} num">${e.market.sp500}</span></span>
+          <span class="mkt"><span class="k">米10年金利</span><span class="v ${dir(e.market.us10y)} num">${e.market.us10y}</span></span>
+          <span class="mkt"><span class="k">ドル円</span><span class="v ${dir(e.market.usdjpy)} num">${e.market.usdjpy}</span></span>
+        </div></div>
+        <div class="block"><h3>関連ソース</h3><ul class="sources">${e.sources.map(s=>`<li>${s}</li>`).join('')}</ul></div>
+      </div></div></div>
+    </div>`;
+  tl.appendChild(el);
+
+  const btn = el.querySelector('.summary');
+  btn.addEventListener('click', ()=>{
+    const open = el.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open ? 'true':'false');
+  });
+});
+
+const ov = document.getElementById('overview');
+const ovBtn = document.getElementById('ov-toggle');
+ovBtn.addEventListener('click', ()=>{
+  const open = ov.classList.toggle('open');
+  ovBtn.setAttribute('aria-expanded', open?'true':'false');
+  ovBtn.textContent = open ? '閉じる ▴' : '詳しく見る ▾';
+});
+</script>

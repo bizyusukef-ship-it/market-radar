@@ -1,0 +1,87 @@
+[
+  {
+    "time": "03:00",
+    "country": "US",
+    "name": "FOMC 政策金利発表・議長会見",
+    "impact": "high",
+    "unit": "",
+    "consensus": null,
+    "prior": null,
+    "actual": null,
+    "meaning": "米金融政策の決定会合。金利水準より声明・見通し・会見のトーンが相場を動かす。",
+    "deep_dive": [
+      "年8回開催。発表物は<b>①声明文 ②経済見通し（SEP）とドットチャート（四半期会合のみ） ③30分後の議長会見</b>の3点セットで、それぞれが独立に相場を動かす。",
+      "声明文は<b>前回からの文言変更</b>が全て。景気・インフレ認識の形容詞1つの変化が政策転換のシグナルとして読まれる。",
+      "ドットチャートは参加者の政策金利見通しの分布。<b>中央値の利下げ回数</b>が市場の織り込みとズレると大きく動く。"
+    ],
+    "reaction": "タカ派（利下げに慎重）ならリスクオフで株安・金利高・ドル高。ハト派（利下げ前向き）ならリスクオンで株高・ドル安に振れやすい。",
+    "market": {
+      "nikkei": "—",
+      "sp500": "—",
+      "us10y": "—",
+      "usdjpy": "—"
+    },
+    "sources": [
+      "FOMC Meeting 公表スケジュール https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+    ],
+    "highlights": [
+      {
+        "k": "未取得",
+        "v": "声明ページがまだ見つかりません（https://www.federalreserve.gov/newsevents/pressreleases/monetary20260729a.htm）"
+      }
+    ]
+  },
+  {
+    "time": "21:30",
+    "country": "US",
+    "name": "GDP速報",
+    "impact": "high",
+    "unit": "%",
+    "consensus": null,
+    "prior": null,
+    "actual": null,
+    "meaning": "米経済成長率（季節調整済み年率換算）。景気の全体像を示す代表指標。",
+    "deep_dive": [
+      "商務省が四半期ごとに発表。個人消費・設備投資・住宅投資・政府支出・純輸出の寄与度分解が内訳の読みどころで、特に<b>個人消費支出（PCE）の伸び</b>は米経済の7割を占める最重要項目。",
+      "同時に発表される<b>GDP物価指数</b>や<b>コアPCE価格指数（速報値）</b>もインフレ動向の参考にされる。",
+      "速報値は後日の改定で数字が変わることが多く、市場は<b>方向感（加速/減速）</b>を重視する。"
+    ],
+    "reaction": "上振れは景気堅調を示し株にプラスだが、過熱感が強いと利下げ観測後退で金利上昇・株の重しにもなる。下振れは景気減速懸念から株安・金利低下要因になりやすい。",
+    "market": {
+      "nikkei": "—",
+      "sp500": "—",
+      "us10y": "—",
+      "usdjpy": "—"
+    },
+    "sources": [
+      "Gross Domestic Product 公表スケジュール https://apps.bea.gov/API/signup/release_dates.json",
+      "Gross Domestic Product 実績値(FRED) https://fred.stlouisfed.org/series/A191RL1Q225SBEA"
+    ]
+  },
+  {
+    "time": "21:30",
+    "country": "US",
+    "name": "PCEデフレーター",
+    "impact": "high",
+    "unit": "%",
+    "consensus": null,
+    "prior": null,
+    "actual": null,
+    "meaning": "FRBが物価目標に採用する指標。CPIより遅れて出るが、政策判断上はこちらが本命。",
+    "deep_dive": [
+      "商務省が毎月発表する個人消費支出（PCE）に対応する物価指数。CPIと異なり<b>消費構成の変化を反映しやすい</b>算式のため、FRBはこちらを政策目標（2%）の基準にしている。",
+      "食品・エネルギーを除いた<b>コアPCE</b>が金融政策上の最重要指標。同時に発表される個人所得・個人消費支出の伸びも、需要側からのインフレ圧力を見るうえで参考になる。"
+    ],
+    "reaction": "CPIと同様、上振れは利下げ後ずれ観測から金利上昇・株安要因。ただしCPI発表から間もないため、サプライズが小さければ相場インパクトは限定的になりやすい。",
+    "market": {
+      "nikkei": "—",
+      "sp500": "—",
+      "us10y": "—",
+      "usdjpy": "—"
+    },
+    "sources": [
+      "Personal Income and Outlays 公表スケジュール https://apps.bea.gov/API/signup/release_dates.json",
+      "Personal Income and Outlays 実績値(FRED) https://fred.stlouisfed.org/series/PCEPI"
+    ]
+  }
+]
