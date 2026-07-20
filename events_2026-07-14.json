@@ -1,1 +1,29 @@
-[]
+[
+  {
+    "time": "21:30",
+    "country": "US",
+    "name": "消費者物価指数 CPI（前年比）",
+    "impact": "high",
+    "unit": "%",
+    "consensus": null,
+    "prior": "4.2",
+    "actual": "3.5",
+    "meaning": "米インフレの中心指標。FRBの利下げ・利上げ判断に直結する。",
+    "deep_dive": [
+      "米労働省（BLS）が毎月発表。市場が最も注目するのは<b>コアCPI（食品・エネルギー除く）の前月比</b>で、直近のインフレ運動量を示す。",
+      "内訳では<b>住居費（シェルター）</b>がコアの約4割を占め遅行しやすい。住居費を除いた<b>スーパーコア（コアサービスから住居を除く）</b>は賃金インフレの代理指標としてFRBが注視。",
+      "FRBの物価目標はCPIではなく<b>PCEデフレーター</b>だが、CPIの方が先に出るため相場への初動インパクトはCPIが最大。"
+    ],
+    "reaction": "予想上振れ（インフレ再燃）は利下げ後ずれ観測 → 長期金利上昇・ドル高・株安、特に高PERのグロース株に逆風。下振れなら逆にリスクオン。",
+    "market": {
+      "nikkei": "—",
+      "sp500": "—",
+      "us10y": "—",
+      "usdjpy": "—"
+    },
+    "sources": [
+      "Consumer Price Index 公表スケジュール https://www.bls.gov/schedule/news_release/cpi.htm",
+      "Consumer Price Index 実績値(FRED) https://fred.stlouisfed.org/series/CPIAUCNS"
+    ]
+  }
+]

@@ -116,6 +116,29 @@
   .sources li{padding:3px 0; color:var(--ink-faint); overflow-wrap:anywhere}
   .sources li::before{content:"↳ "; color:var(--sky)}
 
+  /* 過去14日間のアーカイブ */
+  .archive{margin-top:30px}
+  .arch-note{font-size:12px; color:var(--ink-faint); margin:0 0 12px}
+  .arch-major{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:13px 15px; margin-bottom:10px}
+  .arch-major .when{font-size:11px; color:var(--ink-faint); letter-spacing:.04em}
+  .arch-major .ttl{font-size:14.5px; font-weight:500; margin-top:2px}
+  .arch-major .pending{display:inline-block; margin-top:6px; font-size:11px; color:#8a5a2a; background:#F3E7D3; border:1px solid #E4CFA9; border-radius:999px; padding:2px 8px}
+  .arch-hl{margin-top:9px; border:1px solid var(--line-soft); border-radius:8px; overflow:hidden}
+  .arch-hl .row{display:grid; grid-template-columns:104px 1fr; border-top:1px solid var(--line-soft)}
+  .arch-hl .row:first-child{border-top:none}
+  .arch-hl .k{background:var(--surface-2); padding:8px 10px; font-size:11px; font-weight:500; color:var(--olive)}
+  .arch-hl .v{padding:8px 10px; font-size:12.5px; overflow-wrap:anywhere}
+  .arch-list{list-style:none; margin:0; padding:0; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden}
+  .arch-list li{border-top:1px solid var(--line-soft)}
+  .arch-list li:first-child{border-top:none}
+  .arch-list a{display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:baseline; padding:10px 14px; text-decoration:none; color:inherit}
+  .arch-list a:hover{background:var(--surface-2)}
+  .arch-date{font-size:12.5px; color:var(--ink-soft); white-space:nowrap}
+  .arch-ev{font-size:13px; min-width:0}
+  .arch-ev .sep{color:var(--ink-faint); margin:0 5px}
+  .arch-ev .val{color:var(--ink-soft)}
+  .arch-quiet{margin:10px 0 0; font-size:11.5px; color:var(--ink-faint); line-height:1.7}
+
   footer{margin:36px 0 40px; padding-top:16px; border-top:1px solid var(--line); font-size:11.5px; color:var(--ink-faint); line-height:1.7}
 
   @media (max-width:560px){
@@ -168,6 +191,8 @@
   <div class="day-label">タイムライン（JST）</div>
   <div class="timeline" id="timeline"><!-- events injected --></div>
 
+  <section class="archive" id="archive"><div class="day-label">過去14日間のふりかえり</div><p class="arch-note">06/30（火） 〜 07/13（月）　日付を押すとその日のレポートが開きます。</p><ul class="arch-list"><li><a href="dashboard_2026-07-02.html"><span class="arch-date">07/02（木）</span><span class="arch-ev">US 非農業部門雇用者数 NFP <span class="val">+5.7万人</span></span></a></li></ul><p class="arch-quiet">主要イベントなし: 07/12（日）、07/13（月）</p></section>
+
   <footer>
     このダッシュボードは公開情報を整理・要約するためのものです。「想定される株価の反応」は一般的・教科書的な方向性の目安であり、特定銘柄の売買判断や将来予測ではありません。実際の値動きは他の多数の要因で変わります。<br>
     データソース／数値は収集モジュールが自動挿入します。
@@ -198,7 +223,35 @@
    market    : { nikkei, sp500, us10y, usdjpy }  発表後の市場反応
    sources   : [ "媒体名 記事タイトル", ... ]  収集時に自動挿入
    ============================================================ */
-const EVENTS = [];
+const EVENTS = [
+  {
+    "time": "21:30",
+    "country": "US",
+    "name": "消費者物価指数 CPI（前年比）",
+    "impact": "high",
+    "unit": "%",
+    "consensus": null,
+    "prior": "4.2",
+    "actual": "3.5",
+    "meaning": "米インフレの中心指標。FRBの利下げ・利上げ判断に直結する。",
+    "deep_dive": [
+      "米労働省（BLS）が毎月発表。市場が最も注目するのは<b>コアCPI（食品・エネルギー除く）の前月比</b>で、直近のインフレ運動量を示す。",
+      "内訳では<b>住居費（シェルター）</b>がコアの約4割を占め遅行しやすい。住居費を除いた<b>スーパーコア（コアサービスから住居を除く）</b>は賃金インフレの代理指標としてFRBが注視。",
+      "FRBの物価目標はCPIではなく<b>PCEデフレーター</b>だが、CPIの方が先に出るため相場への初動インパクトはCPIが最大。"
+    ],
+    "reaction": "予想上振れ（インフレ再燃）は利下げ後ずれ観測 → 長期金利上昇・ドル高・株安、特に高PERのグロース株に逆風。下振れなら逆にリスクオン。",
+    "market": {
+      "nikkei": "—",
+      "sp500": "—",
+      "us10y": "—",
+      "usdjpy": "—"
+    },
+    "sources": [
+      "Consumer Price Index 公表スケジュール https://www.bls.gov/schedule/news_release/cpi.htm",
+      "Consumer Price Index 実績値(FRED) https://fred.stlouisfed.org/series/CPIAUCNS"
+    ]
+  }
+];
 
 const tl = document.getElementById('timeline');
 
