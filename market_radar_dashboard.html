@@ -128,16 +128,9 @@
   .arch-hl .row:first-child{border-top:none}
   .arch-hl .k{background:var(--surface-2); padding:8px 10px; font-size:11px; font-weight:500; color:var(--olive)}
   .arch-hl .v{padding:8px 10px; font-size:12.5px; overflow-wrap:anywhere}
-  .arch-list{list-style:none; margin:0; padding:0; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden}
-  .arch-list li{border-top:1px solid var(--line-soft)}
-  .arch-list li:first-child{border-top:none}
-  .arch-list a{display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:baseline; padding:10px 14px; text-decoration:none; color:inherit}
-  .arch-list a:hover{background:var(--surface-2)}
-  .arch-date{font-size:12.5px; color:var(--ink-soft); white-space:nowrap}
-  .arch-ev{font-size:13px; min-width:0}
-  .arch-ev .sep{color:var(--ink-faint); margin:0 5px}
-  .arch-ev .val{color:var(--ink-soft)}
-  .arch-quiet{margin:10px 0 0; font-size:11.5px; color:var(--ink-faint); line-height:1.7}
+  .arch-group{margin-bottom:18px}
+  .arch-daylabel{font-size:12px; color:var(--ink-soft); font-weight:500; margin:0 0 9px; padding-bottom:5px; border-bottom:1px solid var(--line-soft)}
+  .arch-quiet{margin:14px 0 0; font-size:11.5px; color:var(--ink-faint); line-height:1.7}
 
   footer{margin:36px 0 40px; padding-top:16px; border-top:1px solid var(--line); font-size:11.5px; color:var(--ink-faint); line-height:1.7}
 
@@ -309,6 +302,10 @@ const EVENTS = [
   }
 ];
 
+/* 過去分のふりかえりデータ。generate_dashboard.py が
+   [{date:"YYYY-MM-DD", label:"07/14（火）", events:[EVENTSと同じ形...]}] に差し替える。 */
+const ARCHIVE = [];
+
 const tl = document.getElementById('timeline');
 
 function surpriseTag(consensus, actual){
@@ -329,9 +326,12 @@ function fmtVal(v, unit){
   return (v===null || v===undefined) ? '<span style="color:var(--ink-faint)">未取得</span>' : v+unit;
 }
 
-EVENTS.forEach((e,i)=>{
+/* 1イベント分のカードを組み立てて返す。タイムラインとアーカイブで共用する。
+   uid は detail 要素のidに使う（ページ内で重複しないよう呼び出し側で振る）。 */
+function makeEvent(e, uid){
   const el = document.createElement('div');
   el.className = 'event '+e.impact;
+  const i = uid;
   const actualTxt = e.actual===null ? '<span style="color:var(--ink-faint)">未発表</span>' : e.actual+e.unit;
   const deepHtml = (e.deep_dive||[]).map(p=>`<p>${p}</p>`).join('');
   const hlHtml = (e.highlights && e.highlights.length)
@@ -369,14 +369,35 @@ EVENTS.forEach((e,i)=>{
         <div class="block"><h3>関連ソース</h3><ul class="sources">${e.sources.map(s=>`<li>${s}</li>`).join('')}</ul></div>
       </div></div></div>
     </div>`;
-  tl.appendChild(el);
 
   const btn = el.querySelector('.summary');
   btn.addEventListener('click', ()=>{
     const open = el.classList.toggle('open');
     btn.setAttribute('aria-expanded', open ? 'true':'false');
   });
-});
+  return el;
+}
+
+EVENTS.forEach((e,i)=> tl.appendChild(makeEvent(e, 'd'+i)));
+
+/* 過去分のふりかえり。日付リンクで飛ばさず、その場で展開できるよう
+   タイムラインと同じカードを日ごとに並べる。 */
+const archRoot = document.getElementById('arch-days');
+if(archRoot){
+  ARCHIVE.forEach((day,di)=>{
+    const grp = document.createElement('div');
+    grp.className = 'arch-group';
+    const label = document.createElement('div');
+    label.className = 'arch-daylabel';
+    label.textContent = day.label;
+    grp.appendChild(label);
+    const line = document.createElement('div');
+    line.className = 'timeline';
+    day.events.forEach((e,ei)=> line.appendChild(makeEvent(e, `a${di}_${ei}`)));
+    grp.appendChild(line);
+    archRoot.appendChild(grp);
+  });
+}
 
 const ov = document.getElementById('overview');
 const ovBtn = document.getElementById('ov-toggle');

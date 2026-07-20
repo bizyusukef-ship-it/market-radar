@@ -128,16 +128,9 @@
   .arch-hl .row:first-child{border-top:none}
   .arch-hl .k{background:var(--surface-2); padding:8px 10px; font-size:11px; font-weight:500; color:var(--olive)}
   .arch-hl .v{padding:8px 10px; font-size:12.5px; overflow-wrap:anywhere}
-  .arch-list{list-style:none; margin:0; padding:0; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden}
-  .arch-list li{border-top:1px solid var(--line-soft)}
-  .arch-list li:first-child{border-top:none}
-  .arch-list a{display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:baseline; padding:10px 14px; text-decoration:none; color:inherit}
-  .arch-list a:hover{background:var(--surface-2)}
-  .arch-date{font-size:12.5px; color:var(--ink-soft); white-space:nowrap}
-  .arch-ev{font-size:13px; min-width:0}
-  .arch-ev .sep{color:var(--ink-faint); margin:0 5px}
-  .arch-ev .val{color:var(--ink-soft)}
-  .arch-quiet{margin:10px 0 0; font-size:11.5px; color:var(--ink-faint); line-height:1.7}
+  .arch-group{margin-bottom:18px}
+  .arch-daylabel{font-size:12px; color:var(--ink-soft); font-weight:500; margin:0 0 9px; padding-bottom:5px; border-bottom:1px solid var(--line-soft)}
+  .arch-quiet{margin:14px 0 0; font-size:11.5px; color:var(--ink-faint); line-height:1.7}
 
   footer{margin:36px 0 40px; padding-top:16px; border-top:1px solid var(--line); font-size:11.5px; color:var(--ink-faint); line-height:1.7}
 
@@ -191,7 +184,7 @@
   <div class="day-label">タイムライン（JST）</div>
   <div class="timeline" id="timeline"><!-- events injected --></div>
 
-  <section class="archive" id="archive"><div class="day-label">過去14日間のふりかえり</div><p class="arch-note">07/06（月） 〜 07/19（日）　日付を押すとその日のレポートが開きます。</p><ul class="arch-list"><li><a href="dashboard_2026-07-14.html"><span class="arch-date">07/14（火）</span><span class="arch-ev">US 消費者物価指数 CPI（前年比） <span class="val">3.5%</span></span></a></li></ul><p class="arch-quiet">主要イベントなし: 07/12（日）、07/13（月）、07/15（水）、07/16（木）、07/17（金）、07/18（土）、07/19（日）</p></section>
+  <section class="archive" id="archive"><div class="day-label">過去60日間のふりかえり</div><p class="arch-note">05/21（木） 〜 07/19（日）　各イベントを押すとその場で詳細が開きます。</p><div class="day-label" style="margin-top:0">主要イベント（要約対象）</div><div class="arch-major"><div class="when">06/16（火） 12:00 JST</div><div class="ttl">JP　日銀金融政策決定会合</div><div class="arch-hl"><div class="row"><div class="k">金融政策決定</div><div class="v">無担保コールレート誘導目標を1.0％程度に引き上げ（利上げ）。票決は7対1（反対：浅田委員）。</div></div><div class="row"><div class="k">背景説明</div><div class="v">原油価格上昇を起点とした企業間の価格転嫁の加速と、中長期の予想物価上昇率の上昇を踏まえ、2%目標を上振れるリスクに対応するため緩和度合いを調整と説明。</div></div><div class="row"><div class="k">先行きの姿勢</div><div class="v">経済・物価・金融情勢に応じて、引き続き政策金利を引き上げていく方針を示唆。調整の時期・ペースは中東情勢の影響を見極めながら判断するとした。</div></div></div></div><div class="arch-major"><div class="when">06/18（木） 03:00 JST</div><div class="ttl">US　FOMC 政策金利発表・議長会見</div><div class="arch-hl"><div class="row"><div class="k">金利決定</div><div class="v">FF金利の誘導目標を3.50〜3.75％で据え置き。票決は12対0の全会一致。銀行システムに潤沢な準備預金を維持する方針も再確認した。</div></div><div class="row"><div class="k">景気認識</div><div class="v">中東情勢に起因する不確実性は高いものの、経済活動は堅調（solid）なペースで拡大していると評価。生産性の伸びと設備投資は力強く、雇用の増加は労働力人口の伸びに見合っており失業率もほぼ横ばいとした。</div></div><div class="row"><div class="k">物価認識</div><div class="v">インフレは2％目標に対して依然高い水準にあり、その一因はエネルギーを含む一部分野の価格を押し上げた供給ショックにあると説明。「物価安定を実現する」と明記した。</div></div><div class="row"><div class="k">会見トーン</div><div class="v">議長会見の文字起こしは当日中に公表されないため、トーンについては未確認。</div></div></div></div><div id="arch-days"></div><p class="arch-quiet">このほか 7 日間は主要イベントがありませんでした。</p></section>
 
   <footer>
     このダッシュボードは公開情報を整理・要約するためのものです。「想定される株価の反応」は一般的・教科書的な方向性の目安であり、特定銘柄の売買判断や将来予測ではありません。実際の値動きは他の多数の要因で変わります。<br>
@@ -225,6 +218,327 @@
    ============================================================ */
 const EVENTS = [];
 
+/* 過去分のふりかえりデータ。generate_dashboard.py が
+   [{date:"YYYY-MM-DD", label:"07/14（火）", events:[EVENTSと同じ形...]}] に差し替える。 */
+const ARCHIVE = [
+  {
+    "date": "2026-07-14",
+    "label": "07/14（火）",
+    "events": [
+      {
+        "time": "21:30",
+        "country": "US",
+        "name": "消費者物価指数 CPI（前年比）",
+        "impact": "high",
+        "unit": "%",
+        "consensus": null,
+        "prior": "4.2",
+        "actual": "3.5",
+        "meaning": "米インフレの中心指標。FRBの利下げ・利上げ判断に直結する。",
+        "deep_dive": [
+          "米労働省（BLS）が毎月発表。市場が最も注目するのは<b>コアCPI（食品・エネルギー除く）の前月比</b>で、直近のインフレ運動量を示す。",
+          "内訳では<b>住居費（シェルター）</b>がコアの約4割を占め遅行しやすい。住居費を除いた<b>スーパーコア（コアサービスから住居を除く）</b>は賃金インフレの代理指標としてFRBが注視。",
+          "FRBの物価目標はCPIではなく<b>PCEデフレーター</b>だが、CPIの方が先に出るため相場への初動インパクトはCPIが最大。"
+        ],
+        "reaction": "予想上振れ（インフレ再燃）は利下げ後ずれ観測 → 長期金利上昇・ドル高・株安、特に高PERのグロース株に逆風。下振れなら逆にリスクオン。",
+        "market": {
+          "nikkei": "—",
+          "sp500": "—",
+          "us10y": "—",
+          "usdjpy": "—"
+        },
+        "sources": [
+          "Consumer Price Index 公表スケジュール https://www.bls.gov/schedule/news_release/cpi.htm",
+          "Consumer Price Index 実績値(FRED) https://fred.stlouisfed.org/series/CPIAUCNS"
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-07-03",
+    "label": "07/03（金）",
+    "events": [
+      {
+        "time": "23:00",
+        "country": "US",
+        "name": "ISM非製造業景況指数",
+        "impact": "mid",
+        "unit": "",
+        "consensus": null,
+        "prior": null,
+        "actual": null,
+        "meaning": "サービス業（非製造業）の景況感。米経済の7割を占めるサービス部門の体温計。",
+        "deep_dive": [
+          "製造業版と同じPMI型指標で<b>50が拡大・縮小の分岐点</b>。米経済の大部分を占めるサービス業を対象とするため、製造業版より景気全体との連動性が高いとされる。",
+          "内訳では<b>事業活動指数</b>と<b>雇用指数</b>が重視され、特に雇用指数は数日後の雇用統計の先読み材料として見られる。"
+        ],
+        "reaction": "上振れは景気の底堅さを示し金利上昇要因になりやすい。下振れはサービス消費の減速懸念から株安・金利低下要因になりやすい。",
+        "market": {
+          "nikkei": "—",
+          "sp500": "—",
+          "us10y": "—",
+          "usdjpy": "—"
+        },
+        "sources": [
+          "ISM Non-Manufacturing PMI 公表スケジュール https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/"
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-07-02",
+    "label": "07/02（木）",
+    "events": [
+      {
+        "time": "21:30",
+        "country": "US",
+        "name": "非農業部門雇用者数 NFP",
+        "impact": "high",
+        "unit": "万人",
+        "consensus": null,
+        "prior": "+12.9",
+        "actual": "+5.7",
+        "meaning": "米雇用統計の中核。景気の強さと賃金インフレ圧力を映す。",
+        "deep_dive": [
+          "毎月第1金曜発表。ヘッドラインのNFPと同時に<b>失業率</b>と<b>平均時給（前月比/前年比）</b>が出る。インフレ観点では平均時給が最重要。",
+          "<b>過去2カ月分の改定値</b>も相場を動かす。ヘッドラインが強くても大幅下方改定なら評価は割引かれる。",
+          "労働参加率や週平均労働時間まで見ると、雇用の「量」と「質」の両面が判断できる。"
+        ],
+        "reaction": "大幅上振れ（雇用が強い）は景気堅調を示す一方、利下げ観測を後退させ金利上昇 → 株はまちまち〜逆風。弱ければ利下げ期待で株高に振れやすい。",
+        "market": {
+          "nikkei": "—",
+          "sp500": "—",
+          "us10y": "—",
+          "usdjpy": "—"
+        },
+        "sources": [
+          "Employment Situation 公表スケジュール https://www.bls.gov/schedule/news_release/empsit.htm",
+          "Employment Situation 実績値(FRED) https://fred.stlouisfed.org/series/PAYEMS"
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-07-01",
+    "label": "07/01（水）",
+    "events": [
+      {
+        "time": "08:50",
+        "country": "JP",
+        "name": "日銀短観 大企業製造業DI",
+        "impact": "high",
+        "unit": "",
+        "consensus": null,
+        "prior": "+17",
+        "actual": "+22",
+        "meaning": "日銀が四半期ごとに公表する企業の景況感調査。",
+        "deep_dive": [
+          "全国約1万社への調査で、「業況が良い」と答えた企業の割合から「悪い」の割合を引いた値がDI。<b>プラス幅が大きいほど景況感が良い</b>。",
+          "見出しになるのは大企業製造業DIだが、内訳の<b>設備投資計画</b>と<b>想定為替レート</b>も重要。企業の想定レートより実勢が円安なら輸出企業の業績上振れ余地を示す。",
+          "日銀が金融政策判断の材料に使う調査のため、強い結果は利上げ（正常化）観測に直結しやすい。"
+        ],
+        "reaction": "上振れ（景況感改善）は日本株の追い風。ただし強すぎると日銀の正常化（利上げ）観測を強め、円高・輸出株の逆風要因にもなり得る。",
+        "market": {
+          "nikkei": "—",
+          "sp500": "—",
+          "us10y": "—",
+          "usdjpy": "—"
+        },
+        "sources": [
+          "BOJ Tankan 公表スケジュール https://www.boj.or.jp/statistics/outline/tkohyos.xlsx"
+        ]
+      },
+      {
+        "time": "23:00",
+        "country": "US",
+        "name": "ISM製造業景況指数",
+        "impact": "mid",
+        "unit": "",
+        "consensus": null,
+        "prior": null,
+        "actual": null,
+        "meaning": "製造業の景況感。50が拡大・縮小の分岐点。",
+        "deep_dive": [
+          "購買担当者へのアンケートに基づくPMI型指標で、<b>50超＝拡大、50未満＝縮小</b>。実体データより早く出るため景気の先行指標とされる。",
+          "内訳の<b>新規受注</b>（先行性が最も高い）、<b>雇用</b>（雇用統計の先読み）、<b>支払価格</b>（インフレ圧力）の3項目が特に材料視される。"
+        ],
+        "reaction": "50割れ深化（下振れ）は景気減速シグナルで株の重し。ただし利下げ期待の高まりが下支えする局面もあり、金利との綱引きになりやすい。",
+        "market": {
+          "nikkei": "—",
+          "sp500": "—",
+          "us10y": "—",
+          "usdjpy": "—"
+        },
+        "sources": [
+          "ISM Manufacturing PMI 公表スケジュール https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/"
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-06-18",
+    "label": "06/18（木）",
+    "events": [
+      {
+        "time": "03:00",
+        "country": "US",
+        "name": "FOMC 政策金利発表・議長会見",
+        "impact": "high",
+        "unit": "",
+        "consensus": null,
+        "prior": null,
+        "actual": null,
+        "meaning": "米金融政策の決定会合。金利水準より声明・見通し・会見のトーンが相場を動かす。",
+        "deep_dive": [
+          "年8回開催。発表物は<b>①声明文 ②経済見通し（SEP）とドットチャート（四半期会合のみ） ③30分後の議長会見</b>の3点セットで、それぞれが独立に相場を動かす。",
+          "声明文は<b>前回からの文言変更</b>が全て。景気・インフレ認識の形容詞1つの変化が政策転換のシグナルとして読まれる。",
+          "ドットチャートは参加者の政策金利見通しの分布。<b>中央値の利下げ回数</b>が市場の織り込みとズレると大きく動く。"
+        ],
+        "reaction": "タカ派（利下げに慎重）ならリスクオフで株安・金利高・ドル高。ハト派（利下げ前向き）ならリスクオンで株高・ドル安に振れやすい。",
+        "market": {
+          "nikkei": "—",
+          "sp500": "—",
+          "us10y": "—",
+          "usdjpy": "—"
+        },
+        "sources": [
+          "FOMC Meeting 公表スケジュール https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+        ],
+        "highlights": [
+          {
+            "k": "金利決定",
+            "v": "FF金利の誘導目標を3.50〜3.75％で据え置き。票決は12対0の全会一致。銀行システムに潤沢な準備預金を維持する方針も再確認した。"
+          },
+          {
+            "k": "景気認識",
+            "v": "中東情勢に起因する不確実性は高いものの、経済活動は堅調（solid）なペースで拡大していると評価。生産性の伸びと設備投資は力強く、雇用の増加は労働力人口の伸びに見合っており失業率もほぼ横ばいとした。"
+          },
+          {
+            "k": "物価認識",
+            "v": "インフレは2％目標に対して依然高い水準にあり、その一因はエネルギーを含む一部分野の価格を押し上げた供給ショックにあると説明。「物価安定を実現する」と明記した。"
+          },
+          {
+            "k": "会見トーン",
+            "v": "議長会見の文字起こしは当日中に公表されないため、トーンについては未確認。"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-06-16",
+    "label": "06/16（火）",
+    "events": [
+      {
+        "time": "12:00",
+        "country": "JP",
+        "name": "日銀金融政策決定会合",
+        "impact": "high",
+        "unit": "",
+        "consensus": null,
+        "prior": null,
+        "actual": null,
+        "meaning": "日銀の金融政策決定会合。政策金利の水準そのものより、声明文の変化と総裁会見のトーンが相場を動かす。",
+        "deep_dive": [
+          "年8回開催。会合後にまず<b>金融市場調節方針の変更について（声明）</b>が公表され、続いて<b>経済・物価情勢の展望（背景説明）</b>、翌営業日以降に<b>主な意見</b>、後日<b>議事要旨</b>が出る。",
+          "声明文は<b>前回からの文言変更</b>が全て。「緩和的な金融環境」「物価安定の目標」等の表現の変化が政策スタンスのシグナルとして読まれる。",
+          "採決の賛否（全会一致か反対票があるか）も、次回以降の政策変更の織り込みに影響する。"
+        ],
+        "reaction": "利上げ・タカ派的な内容は円高・金利上昇要因で輸出株や不動産に逆風、銀行株には追い風。据え置き・ハト派的な内容は逆に円安・株高要因になりやすい。",
+        "market": {
+          "nikkei": "—",
+          "sp500": "—",
+          "us10y": "—",
+          "usdjpy": "—"
+        },
+        "sources": [
+          "BOJ Monetary Policy Meeting 公表スケジュール https://www.boj.or.jp/mopo/mpmsche_minu/index.htm"
+        ],
+        "highlights": [
+          {
+            "k": "金融政策決定",
+            "v": "無担保コールレート誘導目標を1.0％程度に引き上げ（利上げ）。票決は7対1（反対：浅田委員）。"
+          },
+          {
+            "k": "背景説明",
+            "v": "原油価格上昇を起点とした企業間の価格転嫁の加速と、中長期の予想物価上昇率の上昇を踏まえ、2%目標を上振れるリスクに対応するため緩和度合いを調整と説明。"
+          },
+          {
+            "k": "先行きの姿勢",
+            "v": "経済・物価・金融情勢に応じて、引き続き政策金利を引き上げていく方針を示唆。調整の時期・ペースは中東情勢の影響を見極めながら判断するとした。"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-06-10",
+    "label": "06/10（水）",
+    "events": [
+      {
+        "time": "21:30",
+        "country": "US",
+        "name": "消費者物価指数 CPI（前年比）",
+        "impact": "high",
+        "unit": "%",
+        "consensus": null,
+        "prior": "3.8",
+        "actual": "4.2",
+        "meaning": "米インフレの中心指標。FRBの利下げ・利上げ判断に直結する。",
+        "deep_dive": [
+          "米労働省（BLS）が毎月発表。市場が最も注目するのは<b>コアCPI（食品・エネルギー除く）の前月比</b>で、直近のインフレ運動量を示す。",
+          "内訳では<b>住居費（シェルター）</b>がコアの約4割を占め遅行しやすい。住居費を除いた<b>スーパーコア（コアサービスから住居を除く）</b>は賃金インフレの代理指標としてFRBが注視。",
+          "FRBの物価目標はCPIではなく<b>PCEデフレーター</b>だが、CPIの方が先に出るため相場への初動インパクトはCPIが最大。"
+        ],
+        "reaction": "予想上振れ（インフレ再燃）は利下げ後ずれ観測 → 長期金利上昇・ドル高・株安、特に高PERのグロース株に逆風。下振れなら逆にリスクオン。",
+        "market": {
+          "nikkei": "—",
+          "sp500": "—",
+          "us10y": "—",
+          "usdjpy": "—"
+        },
+        "sources": [
+          "Consumer Price Index 公表スケジュール https://www.bls.gov/schedule/news_release/cpi.htm",
+          "Consumer Price Index 実績値(FRED) https://fred.stlouisfed.org/series/CPIAUCNS"
+        ]
+      }
+    ]
+  },
+  {
+    "date": "2026-06-05",
+    "label": "06/05（金）",
+    "events": [
+      {
+        "time": "21:30",
+        "country": "US",
+        "name": "非農業部門雇用者数 NFP",
+        "impact": "high",
+        "unit": "万人",
+        "consensus": null,
+        "prior": "+17.9",
+        "actual": "+17.2",
+        "meaning": "米雇用統計の中核。景気の強さと賃金インフレ圧力を映す。",
+        "deep_dive": [
+          "毎月第1金曜発表。ヘッドラインのNFPと同時に<b>失業率</b>と<b>平均時給（前月比/前年比）</b>が出る。インフレ観点では平均時給が最重要。",
+          "<b>過去2カ月分の改定値</b>も相場を動かす。ヘッドラインが強くても大幅下方改定なら評価は割引かれる。",
+          "労働参加率や週平均労働時間まで見ると、雇用の「量」と「質」の両面が判断できる。"
+        ],
+        "reaction": "大幅上振れ（雇用が強い）は景気堅調を示す一方、利下げ観測を後退させ金利上昇 → 株はまちまち〜逆風。弱ければ利下げ期待で株高に振れやすい。",
+        "market": {
+          "nikkei": "—",
+          "sp500": "—",
+          "us10y": "—",
+          "usdjpy": "—"
+        },
+        "sources": [
+          "Employment Situation 公表スケジュール https://www.bls.gov/schedule/news_release/empsit.htm",
+          "Employment Situation 実績値(FRED) https://fred.stlouisfed.org/series/PAYEMS"
+        ]
+      }
+    ]
+  }
+];
+
 const tl = document.getElementById('timeline');
 
 function surpriseTag(consensus, actual){
@@ -245,9 +559,12 @@ function fmtVal(v, unit){
   return (v===null || v===undefined) ? '<span style="color:var(--ink-faint)">未取得</span>' : v+unit;
 }
 
-EVENTS.forEach((e,i)=>{
+/* 1イベント分のカードを組み立てて返す。タイムラインとアーカイブで共用する。
+   uid は detail 要素のidに使う（ページ内で重複しないよう呼び出し側で振る）。 */
+function makeEvent(e, uid){
   const el = document.createElement('div');
   el.className = 'event '+e.impact;
+  const i = uid;
   const actualTxt = e.actual===null ? '<span style="color:var(--ink-faint)">未発表</span>' : e.actual+e.unit;
   const deepHtml = (e.deep_dive||[]).map(p=>`<p>${p}</p>`).join('');
   const hlHtml = (e.highlights && e.highlights.length)
@@ -285,14 +602,35 @@ EVENTS.forEach((e,i)=>{
         <div class="block"><h3>関連ソース</h3><ul class="sources">${e.sources.map(s=>`<li>${s}</li>`).join('')}</ul></div>
       </div></div></div>
     </div>`;
-  tl.appendChild(el);
 
   const btn = el.querySelector('.summary');
   btn.addEventListener('click', ()=>{
     const open = el.classList.toggle('open');
     btn.setAttribute('aria-expanded', open ? 'true':'false');
   });
-});
+  return el;
+}
+
+EVENTS.forEach((e,i)=> tl.appendChild(makeEvent(e, 'd'+i)));
+
+/* 過去分のふりかえり。日付リンクで飛ばさず、その場で展開できるよう
+   タイムラインと同じカードを日ごとに並べる。 */
+const archRoot = document.getElementById('arch-days');
+if(archRoot){
+  ARCHIVE.forEach((day,di)=>{
+    const grp = document.createElement('div');
+    grp.className = 'arch-group';
+    const label = document.createElement('div');
+    label.className = 'arch-daylabel';
+    label.textContent = day.label;
+    grp.appendChild(label);
+    const line = document.createElement('div');
+    line.className = 'timeline';
+    day.events.forEach((e,ei)=> line.appendChild(makeEvent(e, `a${di}_${ei}`)));
+    grp.appendChild(line);
+    archRoot.appendChild(grp);
+  });
+}
 
 const ov = document.getElementById('overview');
 const ovBtn = document.getElementById('ov-toggle');

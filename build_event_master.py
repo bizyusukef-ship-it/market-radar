@@ -31,8 +31,8 @@ from fetchers.bea import fetch_bea_events
 load_dotenv()
 
 OUTPUT_PATH = "event_master.csv"
-# 過去分は14日間のアーカイブ表示に使うため、余裕をみて21日分を保持する
-WINDOW_PAST_DAYS = 21
+# 過去分は60日間のアーカイブ表示に使うため、余裕をみて75日分を保持する
+WINDOW_PAST_DAYS = 75
 WINDOW_FUTURE_DAYS = 400
 
 FIELDNAMES = [

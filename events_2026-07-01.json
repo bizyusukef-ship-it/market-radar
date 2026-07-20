@@ -1,0 +1,53 @@
+[
+  {
+    "time": "08:50",
+    "country": "JP",
+    "name": "日銀短観 大企業製造業DI",
+    "impact": "high",
+    "unit": "",
+    "consensus": null,
+    "prior": "+17",
+    "actual": "+22",
+    "meaning": "日銀が四半期ごとに公表する企業の景況感調査。",
+    "deep_dive": [
+      "全国約1万社への調査で、「業況が良い」と答えた企業の割合から「悪い」の割合を引いた値がDI。<b>プラス幅が大きいほど景況感が良い</b>。",
+      "見出しになるのは大企業製造業DIだが、内訳の<b>設備投資計画</b>と<b>想定為替レート</b>も重要。企業の想定レートより実勢が円安なら輸出企業の業績上振れ余地を示す。",
+      "日銀が金融政策判断の材料に使う調査のため、強い結果は利上げ（正常化）観測に直結しやすい。"
+    ],
+    "reaction": "上振れ（景況感改善）は日本株の追い風。ただし強すぎると日銀の正常化（利上げ）観測を強め、円高・輸出株の逆風要因にもなり得る。",
+    "market": {
+      "nikkei": "—",
+      "sp500": "—",
+      "us10y": "—",
+      "usdjpy": "—"
+    },
+    "sources": [
+      "BOJ Tankan 公表スケジュール https://www.boj.or.jp/statistics/outline/tkohyos.xlsx"
+    ]
+  },
+  {
+    "time": "23:00",
+    "country": "US",
+    "name": "ISM製造業景況指数",
+    "impact": "mid",
+    "unit": "",
+    "consensus": null,
+    "prior": null,
+    "actual": null,
+    "meaning": "製造業の景況感。50が拡大・縮小の分岐点。",
+    "deep_dive": [
+      "購買担当者へのアンケートに基づくPMI型指標で、<b>50超＝拡大、50未満＝縮小</b>。実体データより早く出るため景気の先行指標とされる。",
+      "内訳の<b>新規受注</b>（先行性が最も高い）、<b>雇用</b>（雇用統計の先読み）、<b>支払価格</b>（インフレ圧力）の3項目が特に材料視される。"
+    ],
+    "reaction": "50割れ深化（下振れ）は景気減速シグナルで株の重し。ただし利下げ期待の高まりが下支えする局面もあり、金利との綱引きになりやすい。",
+    "market": {
+      "nikkei": "—",
+      "sp500": "—",
+      "us10y": "—",
+      "usdjpy": "—"
+    },
+    "sources": [
+      "ISM Manufacturing PMI 公表スケジュール https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/"
+    ]
+  }
+]

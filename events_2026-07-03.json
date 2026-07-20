@@ -1,0 +1,27 @@
+[
+  {
+    "time": "23:00",
+    "country": "US",
+    "name": "ISM非製造業景況指数",
+    "impact": "mid",
+    "unit": "",
+    "consensus": null,
+    "prior": null,
+    "actual": null,
+    "meaning": "サービス業（非製造業）の景況感。米経済の7割を占めるサービス部門の体温計。",
+    "deep_dive": [
+      "製造業版と同じPMI型指標で<b>50が拡大・縮小の分岐点</b>。米経済の大部分を占めるサービス業を対象とするため、製造業版より景気全体との連動性が高いとされる。",
+      "内訳では<b>事業活動指数</b>と<b>雇用指数</b>が重視され、特に雇用指数は数日後の雇用統計の先読み材料として見られる。"
+    ],
+    "reaction": "上振れは景気の底堅さを示し金利上昇要因になりやすい。下振れはサービス消費の減速懸念から株安・金利低下要因になりやすい。",
+    "market": {
+      "nikkei": "—",
+      "sp500": "—",
+      "us10y": "—",
+      "usdjpy": "—"
+    },
+    "sources": [
+      "ISM Non-Manufacturing PMI 公表スケジュール https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/"
+    ]
+  }
+]

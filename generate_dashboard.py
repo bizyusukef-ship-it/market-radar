@@ -21,7 +21,7 @@ WEEKDAY_JA = ["月", "火", "水", "木", "金", "土", "日"]
 OV_LEAD_PLACEHOLDER = "（ここに今日の要点を記入してください）"
 OV_MORE_PLACEHOLDER = "（詳しい解説をここに記入してください）"
 
-ARCHIVE_DAYS = 14
+ARCHIVE_DAYS = 60
 # 要約がまだ書かれていない状態を示すラベル（assemble_events.py が入れる）
 PENDING_LABELS = {"要約待ち", "未取得"}
 
@@ -69,66 +69,61 @@ def render_major(d, event):
     return "".join(parts)
 
 
-def render_day_row(d, events):
-    esc = html.escape
-    labels = []
-    for e in events:
-        val = ""
-        if e.get("actual") is not None:
-            val = f'<span class="val">{esc(str(e["actual"]))}{esc(e.get("unit",""))}</span>'
-        labels.append(f'{esc(e["country"])} {esc(e["name"])} {val}'.strip())
-    body = '<span class="sep">/</span>'.join(labels)
-    href = f"dashboard_{d.isoformat()}.html"
-    return (
-        f'<li><a href="{href}">'
-        f'<span class="arch-date">{esc(short_date(d))}</span>'
-        f'<span class="arch-ev">{body}</span></a></li>'
-    )
+def build_archive(target_date):
+    """target_date の前日までさかのぼって ARCHIVE_DAYS 日分のまとめを作る。
 
-
-def build_archive_html(target_date):
-    """target_date の前日までさかのぼって ARCHIVE_DAYS 日分のまとめを作る。"""
+    戻り値: (セクションのHTML, JSに渡すARCHIVEデータ)
+    日別の中身はリンクで飛ばさず、その場で開けるようJS側でカードを描くため、
+    ここではイベントの生データをそのまま渡す。
+    """
     days = [
         target_date - datetime.timedelta(days=i)
         for i in range(ARCHIVE_DAYS, 0, -1)
     ]
 
     majors = []
-    day_rows = []
-    quiet = []
+    archive_data = []
+    quiet_count = 0
 
-    for d in days:
+    # 新しい日が上に来るよう、表示は降順にする
+    for d in reversed(days):
         events = load_events(d)
         if events is None:
-            continue
+            continue  # データが無い日は「イベントなし」と断定しない
         if not events:
-            quiet.append(short_date(d))
+            quiet_count += 1
             continue
-        day_rows.append(render_day_row(d, events))
+        archive_data.append({
+            "date": d.isoformat(),
+            "label": short_date(d),
+            "events": events,
+        })
         for e in events:
             if "highlights" in e:
-                majors.append(render_major(d, e))
+                majors.append((d, e))
 
-    if not day_rows and not quiet:
-        return ""
+    if not archive_data and not quiet_count:
+        return "", []
 
     period = f"{short_date(days[0])} 〜 {short_date(days[-1])}"
     out = [f'<div class="day-label">過去{ARCHIVE_DAYS}日間のふりかえり</div>']
-    out.append(f'<p class="arch-note">{html.escape(period)}　日付を押すとその日のレポートが開きます。</p>')
+    out.append(
+        f'<p class="arch-note">{html.escape(period)}　各イベントを押すとその場で詳細が開きます。</p>'
+    )
 
     if majors:
         out.append('<div class="day-label" style="margin-top:0">主要イベント（要約対象）</div>')
-        out.extend(majors)
+        # 主要イベントも新しい順に
+        out.extend(render_major(d, e) for d, e in reversed(majors))
 
-    if day_rows:
-        out.append(f'<ul class="arch-list">{"".join(day_rows)}</ul>')
+    out.append('<div id="arch-days"></div>')
 
-    if quiet:
+    if quiet_count:
         out.append(
-            '<p class="arch-quiet">主要イベントなし: ' + "、".join(html.escape(q) for q in quiet) + "</p>"
+            f'<p class="arch-quiet">このほか {quiet_count} 日間は主要イベントがありませんでした。</p>'
         )
 
-    return "".join(out)
+    return "".join(out), archive_data
 
 
 def generate(date_str):
@@ -183,7 +178,7 @@ def generate(date_str):
     if n != 1:
         raise RuntimeError("テンプレート内のov-moreが見つかりませんでした")
 
-    archive_html = build_archive_html(d)
+    archive_html, archive_data = build_archive(d)
     html_out, n = re.subn(
         r'(<section class="archive" id="archive">).*?(</section>)',
         lambda m: m.group(1) + archive_html + m.group(2),
@@ -194,6 +189,17 @@ def generate(date_str):
     if n != 1:
         raise RuntimeError("テンプレート内のarchiveセクションが見つかりませんでした")
     html = html_out
+
+    archive_js = json.dumps(archive_data, ensure_ascii=False, indent=2)
+    html, n = re.subn(
+        r"const ARCHIVE = \[.*?\];",
+        lambda m: f"const ARCHIVE = {archive_js};",
+        html,
+        count=1,
+        flags=re.DOTALL,
+    )
+    if n != 1:
+        raise RuntimeError("テンプレート内のARCHIVE配列が見つかりませんでした")
 
     out_path = f"dashboard_{date_str}.html"
     with open(out_path, "w", encoding="utf-8") as f:

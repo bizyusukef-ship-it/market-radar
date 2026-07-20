@@ -1,0 +1,29 @@
+[
+  {
+    "time": "21:30",
+    "country": "US",
+    "name": "非農業部門雇用者数 NFP",
+    "impact": "high",
+    "unit": "万人",
+    "consensus": null,
+    "prior": "+17.9",
+    "actual": "+17.2",
+    "meaning": "米雇用統計の中核。景気の強さと賃金インフレ圧力を映す。",
+    "deep_dive": [
+      "毎月第1金曜発表。ヘッドラインのNFPと同時に<b>失業率</b>と<b>平均時給（前月比/前年比）</b>が出る。インフレ観点では平均時給が最重要。",
+      "<b>過去2カ月分の改定値</b>も相場を動かす。ヘッドラインが強くても大幅下方改定なら評価は割引かれる。",
+      "労働参加率や週平均労働時間まで見ると、雇用の「量」と「質」の両面が判断できる。"
+    ],
+    "reaction": "大幅上振れ（雇用が強い）は景気堅調を示す一方、利下げ観測を後退させ金利上昇 → 株はまちまち〜逆風。弱ければ利下げ期待で株高に振れやすい。",
+    "market": {
+      "nikkei": "—",
+      "sp500": "—",
+      "us10y": "—",
+      "usdjpy": "—"
+    },
+    "sources": [
+      "Employment Situation 公表スケジュール https://www.bls.gov/schedule/news_release/empsit.htm",
+      "Employment Situation 実績値(FRED) https://fred.stlouisfed.org/series/PAYEMS"
+    ]
+  }
+]
