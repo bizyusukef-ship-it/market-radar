@@ -26,8 +26,8 @@
     ],
     "highlights": [
       {
-        "k": "未取得",
-        "v": "声明ページがまだ見つかりません（https://www.federalreserve.gov/newsevents/pressreleases/monetary20260729a.htm）"
+        "k": "要約待ち",
+        "v": "声明本文をraw_statements/us_fomc_2026-07-30.txtに保存しました。highlights_overrides.jsonにhighlightsを追記してください（元テキスト: https://www.federalreserve.gov/newsevents/pressreleases/monetary20260729a.htm）"
       }
     ]
   },
