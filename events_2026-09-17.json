@@ -1,0 +1,34 @@
+[
+  {
+    "time": "03:00",
+    "country": "US",
+    "name": "FOMC 政策金利発表・議長会見",
+    "impact": "high",
+    "unit": "",
+    "consensus": null,
+    "prior": null,
+    "actual": null,
+    "meaning": "米金融政策の決定会合。金利水準より声明・見通し・会見のトーンが相場を動かす。",
+    "deep_dive": [
+      "年8回開催。発表物は<b>①声明文 ②経済見通し（SEP）とドットチャート（四半期会合のみ） ③30分後の議長会見</b>の3点セットで、それぞれが独立に相場を動かす。",
+      "声明文は<b>前回からの文言変更</b>が全て。景気・インフレ認識の形容詞1つの変化が政策転換のシグナルとして読まれる。",
+      "ドットチャートは参加者の政策金利見通しの分布。<b>中央値の利下げ回数</b>が市場の織り込みとズレると大きく動く。"
+    ],
+    "reaction": "タカ派（利下げに慎重）ならリスクオフで株安・金利高・ドル高。ハト派（利下げ前向き）ならリスクオンで株高・ドル安に振れやすい。",
+    "market": {
+      "nikkei": "—",
+      "sp500": "—",
+      "us10y": "—",
+      "usdjpy": "—"
+    },
+    "sources": [
+      "FOMC Meeting 公表スケジュール https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+    ],
+    "highlights": [
+      {
+        "k": "要約待ち",
+        "v": "声明本文をraw_statements/us_fomc_2026-09-17.txtに保存しました。highlights_overrides.jsonにhighlightsを追記してください（元テキスト: https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916a.htm）"
+      }
+    ]
+  }
+]
