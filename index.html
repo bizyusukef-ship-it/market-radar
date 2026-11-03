@@ -159,7 +159,7 @@
         <p>本日の高影響イベントと、想定される市場の方向感</p>
       </div>
       <div class="meta">
-        <div class="date num" id="today">2026 / 11 / 02（月）</div>
+        <div class="date num" id="today">2026 / 11 / 03（火）</div>
       </div>
     </div>
     <div class="legend">
@@ -184,7 +184,7 @@
   <div class="day-label">タイムライン（JST）</div>
   <div class="timeline" id="timeline"><!-- events injected --></div>
 
-  <section class="archive" id="archive"><div class="day-label">過去60日間のふりかえり</div><p class="arch-note">09/03（木） 〜 11/01（日）　各イベントを押すとその場で詳細が開きます。</p><div class="day-label" style="margin-top:0">主要イベント（要約対象）</div><div class="arch-major"><div class="when">09/17（木） 03:00 JST</div><div class="ttl">US　FOMC 政策金利発表・議長会見</div><span class="pending">要約はまだ書かれていません</span></div><div class="arch-major"><div class="when">09/18（金） 12:00 JST</div><div class="ttl">JP　日銀金融政策決定会合</div><span class="pending">要約はまだ書かれていません</span></div><div class="arch-major"><div class="when">10/29（木） 03:00 JST</div><div class="ttl">US　FOMC 政策金利発表・議長会見</div><span class="pending">要約はまだ書かれていません</span></div><div class="arch-major"><div class="when">10/30（金） 12:00 JST</div><div class="ttl">JP　日銀金融政策決定会合</div><span class="pending">要約はまだ書かれていません</span></div><div id="arch-days"></div><p class="arch-quiet">このほか 47 日間は主要イベントがありませんでした。</p></section>
+  <section class="archive" id="archive"><div class="day-label">過去60日間のふりかえり</div><p class="arch-note">09/04（金） 〜 11/02（月）　各イベントを押すとその場で詳細が開きます。</p><div class="day-label" style="margin-top:0">主要イベント（要約対象）</div><div class="arch-major"><div class="when">09/17（木） 03:00 JST</div><div class="ttl">US　FOMC 政策金利発表・議長会見</div><span class="pending">要約はまだ書かれていません</span></div><div class="arch-major"><div class="when">09/18（金） 12:00 JST</div><div class="ttl">JP　日銀金融政策決定会合</div><span class="pending">要約はまだ書かれていません</span></div><div class="arch-major"><div class="when">10/29（木） 03:00 JST</div><div class="ttl">US　FOMC 政策金利発表・議長会見</div><span class="pending">要約はまだ書かれていません</span></div><div class="arch-major"><div class="when">10/30（金） 12:00 JST</div><div class="ttl">JP　日銀金融政策決定会合</div><span class="pending">要約はまだ書かれていません</span></div><div id="arch-days"></div><p class="arch-quiet">このほか 48 日間は主要イベントがありませんでした。</p></section>
 
   <footer>
     このダッシュボードは公開情報を整理・要約するためのものです。「想定される株価の反応」は一般的・教科書的な方向性の目安であり、特定銘柄の売買判断や将来予測ではありません。実際の値動きは他の多数の要因で変わります。<br>
@@ -216,7 +216,33 @@
    market    : { nikkei, sp500, us10y, usdjpy }  発表後の市場反応
    sources   : [ "媒体名 記事タイトル", ... ]  収集時に自動挿入
    ============================================================ */
-const EVENTS = [];
+const EVENTS = [
+  {
+    "time": "00:00",
+    "country": "US",
+    "name": "ISM製造業景況指数",
+    "impact": "mid",
+    "unit": "",
+    "consensus": null,
+    "prior": null,
+    "actual": null,
+    "meaning": "製造業の景況感。50が拡大・縮小の分岐点。",
+    "deep_dive": [
+      "購買担当者へのアンケートに基づくPMI型指標で、<b>50超＝拡大、50未満＝縮小</b>。実体データより早く出るため景気の先行指標とされる。",
+      "内訳の<b>新規受注</b>（先行性が最も高い）、<b>雇用</b>（雇用統計の先読み）、<b>支払価格</b>（インフレ圧力）の3項目が特に材料視される。"
+    ],
+    "reaction": "50割れ深化（下振れ）は景気減速シグナルで株の重し。ただし利下げ期待の高まりが下支えする局面もあり、金利との綱引きになりやすい。",
+    "market": {
+      "nikkei": "—",
+      "sp500": "—",
+      "us10y": "—",
+      "usdjpy": "—"
+    },
+    "sources": [
+      "ISM Manufacturing PMI 公表スケジュール https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/"
+    ]
+  }
+];
 
 /* 過去分のふりかえりデータ。generate_dashboard.py が
    [{date:"YYYY-MM-DD", label:"07/14（火）", events:[EVENTSと同じ形...]}] に差し替える。 */
@@ -757,37 +783,6 @@ const ARCHIVE = [
         "sources": [
           "Employment Situation 公表スケジュール https://www.bls.gov/schedule/news_release/empsit.htm",
           "Employment Situation 実績値(FRED) https://fred.stlouisfed.org/series/PAYEMS"
-        ]
-      }
-    ]
-  },
-  {
-    "date": "2026-09-03",
-    "label": "09/03（木）",
-    "events": [
-      {
-        "time": "23:00",
-        "country": "US",
-        "name": "ISM非製造業景況指数",
-        "impact": "mid",
-        "unit": "",
-        "consensus": null,
-        "prior": null,
-        "actual": null,
-        "meaning": "サービス業（非製造業）の景況感。米経済の7割を占めるサービス部門の体温計。",
-        "deep_dive": [
-          "製造業版と同じPMI型指標で<b>50が拡大・縮小の分岐点</b>。米経済の大部分を占めるサービス業を対象とするため、製造業版より景気全体との連動性が高いとされる。",
-          "内訳では<b>事業活動指数</b>と<b>雇用指数</b>が重視され、特に雇用指数は数日後の雇用統計の先読み材料として見られる。"
-        ],
-        "reaction": "上振れは景気の底堅さを示し金利上昇要因になりやすい。下振れはサービス消費の減速懸念から株安・金利低下要因になりやすい。",
-        "market": {
-          "nikkei": "—",
-          "sp500": "—",
-          "us10y": "—",
-          "usdjpy": "—"
-        },
-        "sources": [
-          "ISM Non-Manufacturing PMI 公表スケジュール https://www.ismworld.org/supply-management-news-and-reports/reports/ism-pmi-reports/"
         ]
       }
     ]
