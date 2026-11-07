@@ -159,7 +159,7 @@
         <p>本日の高影響イベントと、想定される市場の方向感</p>
       </div>
       <div class="meta">
-        <div class="date num" id="today">2026 / 11 / 06（金）</div>
+        <div class="date num" id="today">2026 / 11 / 07（土）</div>
       </div>
     </div>
     <div class="legend">
@@ -184,7 +184,7 @@
   <div class="day-label">タイムライン（JST）</div>
   <div class="timeline" id="timeline"><!-- events injected --></div>
 
-  <section class="archive" id="archive"><div class="day-label">過去60日間のふりかえり</div><p class="arch-note">09/07（月） 〜 11/05（木）　各イベントを押すとその場で詳細が開きます。</p><div class="day-label" style="margin-top:0">主要イベント（要約対象）</div><div class="arch-major"><div class="when">09/17（木） 03:00 JST</div><div class="ttl">US　FOMC 政策金利発表・議長会見</div><span class="pending">要約はまだ書かれていません</span></div><div class="arch-major"><div class="when">09/18（金） 12:00 JST</div><div class="ttl">JP　日銀金融政策決定会合</div><span class="pending">要約はまだ書かれていません</span></div><div class="arch-major"><div class="when">10/29（木） 03:00 JST</div><div class="ttl">US　FOMC 政策金利発表・議長会見</div><span class="pending">要約はまだ書かれていません</span></div><div class="arch-major"><div class="when">10/30（金） 12:00 JST</div><div class="ttl">JP　日銀金融政策決定会合</div><span class="pending">要約はまだ書かれていません</span></div><div id="arch-days"></div><p class="arch-quiet">このほか 47 日間は主要イベントがありませんでした。</p></section>
+  <section class="archive" id="archive"><div class="day-label">過去60日間のふりかえり</div><p class="arch-note">09/08（火） 〜 11/06（金）　各イベントを押すとその場で詳細が開きます。</p><div class="day-label" style="margin-top:0">主要イベント（要約対象）</div><div class="arch-major"><div class="when">09/17（木） 03:00 JST</div><div class="ttl">US　FOMC 政策金利発表・議長会見</div><span class="pending">要約はまだ書かれていません</span></div><div class="arch-major"><div class="when">09/18（金） 12:00 JST</div><div class="ttl">JP　日銀金融政策決定会合</div><span class="pending">要約はまだ書かれていません</span></div><div class="arch-major"><div class="when">10/29（木） 03:00 JST</div><div class="ttl">US　FOMC 政策金利発表・議長会見</div><span class="pending">要約はまだ書かれていません</span></div><div class="arch-major"><div class="when">10/30（金） 12:00 JST</div><div class="ttl">JP　日銀金融政策決定会合</div><span class="pending">要約はまだ書かれていません</span></div><div id="arch-days"></div><p class="arch-quiet">このほか 46 日間は主要イベントがありませんでした。</p></section>
 
   <footer>
     このダッシュボードは公開情報を整理・要約するためのものです。「想定される株価の反応」は一般的・教科書的な方向性の目安であり、特定銘柄の売買判断や将来予測ではありません。実際の値動きは他の多数の要因で変わります。<br>
@@ -216,39 +216,44 @@
    market    : { nikkei, sp500, us10y, usdjpy }  発表後の市場反応
    sources   : [ "媒体名 記事タイトル", ... ]  収集時に自動挿入
    ============================================================ */
-const EVENTS = [
-  {
-    "time": "22:30",
-    "country": "US",
-    "name": "非農業部門雇用者数 NFP",
-    "impact": "high",
-    "unit": "万人",
-    "consensus": null,
-    "prior": null,
-    "actual": null,
-    "meaning": "米雇用統計の中核。景気の強さと賃金インフレ圧力を映す。",
-    "deep_dive": [
-      "毎月第1金曜発表。ヘッドラインのNFPと同時に<b>失業率</b>と<b>平均時給（前月比/前年比）</b>が出る。インフレ観点では平均時給が最重要。",
-      "<b>過去2カ月分の改定値</b>も相場を動かす。ヘッドラインが強くても大幅下方改定なら評価は割引かれる。",
-      "労働参加率や週平均労働時間まで見ると、雇用の「量」と「質」の両面が判断できる。"
-    ],
-    "reaction": "大幅上振れ（雇用が強い）は景気堅調を示す一方、利下げ観測を後退させ金利上昇 → 株はまちまち〜逆風。弱ければ利下げ期待で株高に振れやすい。",
-    "market": {
-      "nikkei": "—",
-      "sp500": "—",
-      "us10y": "—",
-      "usdjpy": "—"
-    },
-    "sources": [
-      "Employment Situation 公表スケジュール https://www.bls.gov/schedule/news_release/empsit.htm",
-      "Employment Situation 実績値(FRED) https://fred.stlouisfed.org/series/PAYEMS"
-    ]
-  }
-];
+const EVENTS = [];
 
 /* 過去分のふりかえりデータ。generate_dashboard.py が
    [{date:"YYYY-MM-DD", label:"07/14（火）", events:[EVENTSと同じ形...]}] に差し替える。 */
 const ARCHIVE = [
+  {
+    "date": "2026-11-06",
+    "label": "11/06（金）",
+    "events": [
+      {
+        "time": "22:30",
+        "country": "US",
+        "name": "非農業部門雇用者数 NFP",
+        "impact": "high",
+        "unit": "万人",
+        "consensus": null,
+        "prior": null,
+        "actual": null,
+        "meaning": "米雇用統計の中核。景気の強さと賃金インフレ圧力を映す。",
+        "deep_dive": [
+          "毎月第1金曜発表。ヘッドラインのNFPと同時に<b>失業率</b>と<b>平均時給（前月比/前年比）</b>が出る。インフレ観点では平均時給が最重要。",
+          "<b>過去2カ月分の改定値</b>も相場を動かす。ヘッドラインが強くても大幅下方改定なら評価は割引かれる。",
+          "労働参加率や週平均労働時間まで見ると、雇用の「量」と「質」の両面が判断できる。"
+        ],
+        "reaction": "大幅上振れ（雇用が強い）は景気堅調を示す一方、利下げ観測を後退させ金利上昇 → 株はまちまち〜逆風。弱ければ利下げ期待で株高に振れやすい。",
+        "market": {
+          "nikkei": "—",
+          "sp500": "—",
+          "us10y": "—",
+          "usdjpy": "—"
+        },
+        "sources": [
+          "Employment Situation 公表スケジュール https://www.bls.gov/schedule/news_release/empsit.htm",
+          "Employment Situation 実績値(FRED) https://fred.stlouisfed.org/series/PAYEMS"
+        ]
+      }
+    ]
+  },
   {
     "date": "2026-11-05",
     "label": "11/05（木）",
